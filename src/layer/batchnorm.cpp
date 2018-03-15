@@ -13,7 +13,8 @@
 // specific language governing permissions and limitations under the License.
 
 #include "batchnorm.h"
-#include <math.h>
+#include <cmath>
+#include <iostream>
 
 namespace ncnn {
 
@@ -77,13 +78,38 @@ int BatchNorm::forward_inplace(Mat& bottom_top_blob) const
     int h = bottom_top_blob.h;
     int size = w * h;
 
+    /////
+    Mat a_data_, b_data_;
+    a_data_.create(channels);
+    b_data_.create(channels);
+
+    #pragma omp parallel for
+    for(int q=0; q<channels; q++) {
+        float mean = 0, var = 0;
+        float* ptr = bottom_top_blob.channel(q);
+        for(int i=0; i<size; i++) {
+            mean += ptr[i];
+        }
+        mean /= size;
+
+        for(int i=0; i<size; i++) {
+            var += (ptr[i] - mean) * (ptr[i] - mean);
+        }
+        var /= size;
+        float sqrt_var = sqrt(var);
+
+        a_data_[q] = bias_data[q] - mean / (sqrt_var + 1e-6);
+        b_data_[q] = 1.0 / (sqrt_var + 1e-6);
+    }
+    /////
+
     #pragma omp parallel for
     for (int q=0; q<channels; q++)
     {
         float* ptr = bottom_top_blob.channel(q);
 
-        float a = a_data[q];
-        float b = b_data[q];
+        float a = a_data_[q];
+        float b = b_data_[q];
 
         for (int i=0; i<size; i++)
         {

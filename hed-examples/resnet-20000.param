@@ -1,0 +1,151 @@
+7767517
+149 166
+Input            data             0 1 data 0=500 1=500 2=3
+Split            splitncnn_0      1 6 data data_splitncnn_0 data_splitncnn_1 data_splitncnn_2 data_splitncnn_3 data_splitncnn_4 data_splitncnn_5
+Convolution      conv1            1 1 data_splitncnn_5 conv1 0=12 1=3 2=1 3=1 4=1 5=1 6=324
+BatchNorm        bn_conv1         1 1 conv1 conv1_bn_conv1 0=12
+Scale            scale_conv1      1 1 conv1_bn_conv1 conv1_scale_conv1 0=12 1=1
+Split            splitncnn_1      1 2 conv1_scale_conv1 conv1_scale_conv1_splitncnn_0 conv1_scale_conv1_splitncnn_1
+ReLU             conv1_relu       1 1 conv1_scale_conv1_splitncnn_1 conv1_relu
+Pooling          pool1            1 1 conv1_relu pool1 0=0 1=2 2=2 3=0 4=0
+Split            splitncnn_2      1 2 pool1 pool1_splitncnn_0 pool1_splitncnn_1
+Convolution      res2a_branch1    1 1 pool1_splitncnn_1 res2a_branch1 0=48 1=1 2=1 3=1 4=0 5=0 6=576
+BatchNorm        bn2a_branch1     1 1 res2a_branch1 res2a_branch1_bn2a_branch1 0=48
+Scale            scale2a_branch1  1 1 res2a_branch1_bn2a_branch1 res2a_branch1_scale2a_branch1 0=48 1=1
+Convolution      res2a_branch2a   1 1 pool1_splitncnn_0 res2a_branch2a 0=12 1=1 2=1 3=1 4=0 5=0 6=144
+BatchNorm        bn2a_branch2a    1 1 res2a_branch2a res2a_branch2a_bn2a_branch2a 0=12
+Scale            scale2a_branch2a 1 1 res2a_branch2a_bn2a_branch2a res2a_branch2a_scale2a_branch2a 0=12 1=1
+ReLU             res2a_branch2a_relu 1 1 res2a_branch2a_scale2a_branch2a res2a_branch2a_res2a_branch2a_relu
+Convolution      res2a_branch2b   1 1 res2a_branch2a_res2a_branch2a_relu res2a_branch2b 0=12 1=3 2=1 3=1 4=1 5=0 6=1296
+BatchNorm        bn2a_branch2b    1 1 res2a_branch2b res2a_branch2b_bn2a_branch2b 0=12
+Scale            scale2a_branch2b 1 1 res2a_branch2b_bn2a_branch2b res2a_branch2b_scale2a_branch2b 0=12 1=1
+ReLU             res2a_branch2b_relu 1 1 res2a_branch2b_scale2a_branch2b res2a_branch2b_res2a_branch2b_relu
+Convolution      res2a_branch2c   1 1 res2a_branch2b_res2a_branch2b_relu res2a_branch2c 0=48 1=1 2=1 3=1 4=0 5=0 6=576
+BatchNorm        bn2a_branch2c    1 1 res2a_branch2c res2a_branch2c_bn2a_branch2c 0=48
+Scale            scale2a_branch2c 1 1 res2a_branch2c_bn2a_branch2c res2a_branch2c_scale2a_branch2c 0=48 1=1
+Eltwise          res2a            2 1 res2a_branch1_scale2a_branch1 res2a_branch2c_scale2a_branch2c res2a 0=1 -23301=0
+ReLU             res2a_relu       1 1 res2a res2a_res2a_relu
+Split            splitncnn_3      1 2 res2a_res2a_relu res2a_res2a_relu_splitncnn_0 res2a_res2a_relu_splitncnn_1
+Convolution      res2b_branch2a   1 1 res2a_res2a_relu_splitncnn_1 res2b_branch2a 0=12 1=1 2=1 3=1 4=0 5=0 6=576
+BatchNorm        bn2b_branch2a    1 1 res2b_branch2a res2b_branch2a_bn2b_branch2a 0=12
+Scale            scale2b_branch2a 1 1 res2b_branch2a_bn2b_branch2a res2b_branch2a_scale2b_branch2a 0=12 1=1
+ReLU             res2b_branch2a_relu 1 1 res2b_branch2a_scale2b_branch2a res2b_branch2a_res2b_branch2a_relu
+Convolution      res2b_branch2b   1 1 res2b_branch2a_res2b_branch2a_relu res2b_branch2b 0=12 1=3 2=1 3=1 4=1 5=0 6=1296
+BatchNorm        bn2b_branch2b    1 1 res2b_branch2b res2b_branch2b_bn2b_branch2b 0=12
+Scale            scale2b_branch2b 1 1 res2b_branch2b_bn2b_branch2b res2b_branch2b_scale2b_branch2b 0=12 1=1
+ReLU             res2b_branch2b_relu 1 1 res2b_branch2b_scale2b_branch2b res2b_branch2b_res2b_branch2b_relu
+Convolution      res2b_branch2c   1 1 res2b_branch2b_res2b_branch2b_relu res2b_branch2c 0=48 1=1 2=1 3=1 4=0 5=0 6=576
+BatchNorm        bn2b_branch2c    1 1 res2b_branch2c res2b_branch2c_bn2b_branch2c 0=48
+Scale            scale2b_branch2c 1 1 res2b_branch2c_bn2b_branch2c res2b_branch2c_scale2b_branch2c 0=48 1=1
+Eltwise          res2b            2 1 res2a_res2a_relu_splitncnn_0 res2b_branch2c_scale2b_branch2c res2b 0=1 -23301=0
+ReLU             res2b_relu       1 1 res2b res2b_res2b_relu
+Split            splitncnn_4      1 3 res2b_res2b_relu res2b_res2b_relu_splitncnn_0 res2b_res2b_relu_splitncnn_1 res2b_res2b_relu_splitncnn_2
+Convolution      res3a_branch1    1 1 res2b_res2b_relu_splitncnn_2 res3a_branch1 0=96 1=1 2=1 3=2 4=0 5=0 6=4608
+BatchNorm        bn3a_branch1     1 1 res3a_branch1 res3a_branch1_bn3a_branch1 0=96
+Scale            scale3a_branch1  1 1 res3a_branch1_bn3a_branch1 res3a_branch1_scale3a_branch1 0=96 1=1
+Convolution      res3a_branch2a   1 1 res2b_res2b_relu_splitncnn_1 res3a_branch2a 0=24 1=1 2=1 3=2 4=0 5=0 6=1152
+BatchNorm        bn3a_branch2a    1 1 res3a_branch2a res3a_branch2a_bn3a_branch2a 0=24
+Scale            scale3a_branch2a 1 1 res3a_branch2a_bn3a_branch2a res3a_branch2a_scale3a_branch2a 0=24 1=1
+ReLU             res3a_branch2a_relu 1 1 res3a_branch2a_scale3a_branch2a res3a_branch2a_res3a_branch2a_relu
+Convolution      res3a_branch2b   1 1 res3a_branch2a_res3a_branch2a_relu res3a_branch2b 0=24 1=3 2=1 3=1 4=1 5=0 6=5184
+BatchNorm        bn3a_branch2b    1 1 res3a_branch2b res3a_branch2b_bn3a_branch2b 0=24
+Scale            scale3a_branch2b 1 1 res3a_branch2b_bn3a_branch2b res3a_branch2b_scale3a_branch2b 0=24 1=1
+ReLU             res3a_branch2b_relu 1 1 res3a_branch2b_scale3a_branch2b res3a_branch2b_res3a_branch2b_relu
+Convolution      res3a_branch2c   1 1 res3a_branch2b_res3a_branch2b_relu res3a_branch2c 0=96 1=1 2=1 3=1 4=0 5=0 6=2304
+BatchNorm        bn3a_branch2c    1 1 res3a_branch2c res3a_branch2c_bn3a_branch2c 0=96
+Scale            scale3a_branch2c 1 1 res3a_branch2c_bn3a_branch2c res3a_branch2c_scale3a_branch2c 0=96 1=1
+Eltwise          res3a            2 1 res3a_branch1_scale3a_branch1 res3a_branch2c_scale3a_branch2c res3a 0=1 -23301=0
+ReLU             res3a_relu       1 1 res3a res3a_res3a_relu
+Split            splitncnn_5      1 2 res3a_res3a_relu res3a_res3a_relu_splitncnn_0 res3a_res3a_relu_splitncnn_1
+Convolution      res3b_branch2a   1 1 res3a_res3a_relu_splitncnn_1 res3b_branch2a 0=24 1=1 2=1 3=1 4=0 5=0 6=2304
+BatchNorm        bn3b_branch2a    1 1 res3b_branch2a res3b_branch2a_bn3b_branch2a 0=24
+Scale            scale3b_branch2a 1 1 res3b_branch2a_bn3b_branch2a res3b_branch2a_scale3b_branch2a 0=24 1=1
+ReLU             res3b_branch2a_relu 1 1 res3b_branch2a_scale3b_branch2a res3b_branch2a_res3b_branch2a_relu
+Convolution      res3b_branch2b   1 1 res3b_branch2a_res3b_branch2a_relu res3b_branch2b 0=24 1=3 2=1 3=1 4=1 5=0 6=5184
+BatchNorm        bn3b_branch2b    1 1 res3b_branch2b res3b_branch2b_bn3b_branch2b 0=24
+Scale            scale3b_branch2b 1 1 res3b_branch2b_bn3b_branch2b res3b_branch2b_scale3b_branch2b 0=24 1=1
+ReLU             res3b_branch2b_relu 1 1 res3b_branch2b_scale3b_branch2b res3b_branch2b_res3b_branch2b_relu
+Convolution      res3b_branch2c   1 1 res3b_branch2b_res3b_branch2b_relu res3b_branch2c 0=96 1=1 2=1 3=1 4=0 5=0 6=2304
+BatchNorm        bn3b_branch2c    1 1 res3b_branch2c res3b_branch2c_bn3b_branch2c 0=96
+Scale            scale3b_branch2c 1 1 res3b_branch2c_bn3b_branch2c res3b_branch2c_scale3b_branch2c 0=96 1=1
+Eltwise          res3b            2 1 res3a_res3a_relu_splitncnn_0 res3b_branch2c_scale3b_branch2c res3b 0=1 -23301=0
+ReLU             res3b_relu       1 1 res3b res3b_res3b_relu
+Split            splitncnn_6      1 3 res3b_res3b_relu res3b_res3b_relu_splitncnn_0 res3b_res3b_relu_splitncnn_1 res3b_res3b_relu_splitncnn_2
+Convolution      res4a_branch1    1 1 res3b_res3b_relu_splitncnn_2 res4a_branch1 0=192 1=1 2=1 3=2 4=0 5=0 6=18432
+BatchNorm        bn4a_branch1     1 1 res4a_branch1 res4a_branch1_bn4a_branch1 0=192
+Scale            scale4a_branch1  1 1 res4a_branch1_bn4a_branch1 res4a_branch1_scale4a_branch1 0=192 1=1
+Convolution      res4a_branch2a   1 1 res3b_res3b_relu_splitncnn_1 res4a_branch2a 0=48 1=1 2=1 3=2 4=0 5=0 6=4608
+BatchNorm        bn4a_branch2a    1 1 res4a_branch2a res4a_branch2a_bn4a_branch2a 0=48
+Scale            scale4a_branch2a 1 1 res4a_branch2a_bn4a_branch2a res4a_branch2a_scale4a_branch2a 0=48 1=1
+ReLU             res4a_branch2a_relu 1 1 res4a_branch2a_scale4a_branch2a res4a_branch2a_res4a_branch2a_relu
+Convolution      res4a_branch2b   1 1 res4a_branch2a_res4a_branch2a_relu res4a_branch2b 0=48 1=3 2=1 3=1 4=1 5=0 6=20736
+BatchNorm        bn4a_branch2b    1 1 res4a_branch2b res4a_branch2b_bn4a_branch2b 0=48
+Scale            scale4a_branch2b 1 1 res4a_branch2b_bn4a_branch2b res4a_branch2b_scale4a_branch2b 0=48 1=1
+ReLU             res4a_branch2b_relu 1 1 res4a_branch2b_scale4a_branch2b res4a_branch2b_res4a_branch2b_relu
+Convolution      res4a_branch2c   1 1 res4a_branch2b_res4a_branch2b_relu res4a_branch2c 0=192 1=1 2=1 3=1 4=0 5=0 6=9216
+BatchNorm        bn4a_branch2c    1 1 res4a_branch2c res4a_branch2c_bn4a_branch2c 0=192
+Scale            scale4a_branch2c 1 1 res4a_branch2c_bn4a_branch2c res4a_branch2c_scale4a_branch2c 0=192 1=1
+Eltwise          res4a            2 1 res4a_branch1_scale4a_branch1 res4a_branch2c_scale4a_branch2c res4a 0=1 -23301=0
+ReLU             res4a_relu       1 1 res4a res4a_res4a_relu
+Split            splitncnn_7      1 2 res4a_res4a_relu res4a_res4a_relu_splitncnn_0 res4a_res4a_relu_splitncnn_1
+Convolution      res4b_branch2a   1 1 res4a_res4a_relu_splitncnn_1 res4b_branch2a 0=48 1=1 2=1 3=1 4=0 5=0 6=9216
+BatchNorm        bn4b_branch2a    1 1 res4b_branch2a res4b_branch2a_bn4b_branch2a 0=48
+Scale            scale4b_branch2a 1 1 res4b_branch2a_bn4b_branch2a res4b_branch2a_scale4b_branch2a 0=48 1=1
+ReLU             res4b_branch2a_relu 1 1 res4b_branch2a_scale4b_branch2a res4b_branch2a_res4b_branch2a_relu
+Convolution      res4b_branch2b   1 1 res4b_branch2a_res4b_branch2a_relu res4b_branch2b 0=48 1=3 2=1 3=1 4=1 5=0 6=20736
+BatchNorm        bn4b_branch2b    1 1 res4b_branch2b res4b_branch2b_bn4b_branch2b 0=48
+Scale            scale4b_branch2b 1 1 res4b_branch2b_bn4b_branch2b res4b_branch2b_scale4b_branch2b 0=48 1=1
+ReLU             res4b_branch2b_relu 1 1 res4b_branch2b_scale4b_branch2b res4b_branch2b_res4b_branch2b_relu
+Convolution      res4b_branch2c   1 1 res4b_branch2b_res4b_branch2b_relu res4b_branch2c 0=192 1=1 2=1 3=1 4=0 5=0 6=9216
+BatchNorm        bn4b_branch2c    1 1 res4b_branch2c res4b_branch2c_bn4b_branch2c 0=192
+Scale            scale4b_branch2c 1 1 res4b_branch2c_bn4b_branch2c res4b_branch2c_scale4b_branch2c 0=192 1=1
+Eltwise          res4b            2 1 res4a_res4a_relu_splitncnn_0 res4b_branch2c_scale4b_branch2c res4b 0=1 -23301=0
+ReLU             res4b_relu       1 1 res4b res4b_res4b_relu
+Split            splitncnn_8      1 3 res4b_res4b_relu res4b_res4b_relu_splitncnn_0 res4b_res4b_relu_splitncnn_1 res4b_res4b_relu_splitncnn_2
+Convolution      res5a_branch1    1 1 res4b_res4b_relu_splitncnn_2 res5a_branch1 0=384 1=1 2=1 3=2 4=0 5=0 6=73728
+BatchNorm        bn5a_branch1     1 1 res5a_branch1 res5a_branch1_bn5a_branch1 0=384
+Scale            scale5a_branch1  1 1 res5a_branch1_bn5a_branch1 res5a_branch1_scale5a_branch1 0=384 1=1
+Convolution      res5a_branch2a   1 1 res4b_res4b_relu_splitncnn_1 res5a_branch2a 0=96 1=1 2=1 3=2 4=0 5=0 6=18432
+BatchNorm        bn5a_branch2a    1 1 res5a_branch2a res5a_branch2a_bn5a_branch2a 0=96
+Scale            scale5a_branch2a 1 1 res5a_branch2a_bn5a_branch2a res5a_branch2a_scale5a_branch2a 0=96 1=1
+ReLU             res5a_branch2a_relu 1 1 res5a_branch2a_scale5a_branch2a res5a_branch2a_res5a_branch2a_relu
+Convolution      res5a_branch2b   1 1 res5a_branch2a_res5a_branch2a_relu res5a_branch2b 0=96 1=3 2=1 3=1 4=1 5=0 6=82944
+BatchNorm        bn5a_branch2b    1 1 res5a_branch2b res5a_branch2b_bn5a_branch2b 0=96
+Scale            scale5a_branch2b 1 1 res5a_branch2b_bn5a_branch2b res5a_branch2b_scale5a_branch2b 0=96 1=1
+ReLU             res5a_branch2b_relu 1 1 res5a_branch2b_scale5a_branch2b res5a_branch2b_res5a_branch2b_relu
+Convolution      res5a_branch2c   1 1 res5a_branch2b_res5a_branch2b_relu res5a_branch2c 0=384 1=1 2=1 3=1 4=0 5=0 6=36864
+BatchNorm        bn5a_branch2c    1 1 res5a_branch2c res5a_branch2c_bn5a_branch2c 0=384
+Scale            scale5a_branch2c 1 1 res5a_branch2c_bn5a_branch2c res5a_branch2c_scale5a_branch2c 0=384 1=1
+Eltwise          res5a            2 1 res5a_branch1_scale5a_branch1 res5a_branch2c_scale5a_branch2c res5a 0=1 -23301=0
+ReLU             res5a_relu       1 1 res5a res5a_res5a_relu
+Split            splitncnn_9      1 2 res5a_res5a_relu res5a_res5a_relu_splitncnn_0 res5a_res5a_relu_splitncnn_1
+Convolution      res5b_branch2a   1 1 res5a_res5a_relu_splitncnn_1 res5b_branch2a 0=96 1=1 2=1 3=1 4=0 5=0 6=36864
+BatchNorm        bn5b_branch2a    1 1 res5b_branch2a res5b_branch2a_bn5b_branch2a 0=96
+Scale            scale5b_branch2a 1 1 res5b_branch2a_bn5b_branch2a res5b_branch2a_scale5b_branch2a 0=96 1=1
+ReLU             res5b_branch2a_relu 1 1 res5b_branch2a_scale5b_branch2a res5b_branch2a_res5b_branch2a_relu
+Convolution      res5b_branch2b   1 1 res5b_branch2a_res5b_branch2a_relu res5b_branch2b 0=96 1=3 2=1 3=1 4=1 5=0 6=82944
+BatchNorm        bn5b_branch2b    1 1 res5b_branch2b res5b_branch2b_bn5b_branch2b 0=96
+Scale            scale5b_branch2b 1 1 res5b_branch2b_bn5b_branch2b res5b_branch2b_scale5b_branch2b 0=96 1=1
+ReLU             res5b_branch2b_relu 1 1 res5b_branch2b_scale5b_branch2b res5b_branch2b_res5b_branch2b_relu
+Convolution      res5b_branch2c   1 1 res5b_branch2b_res5b_branch2b_relu res5b_branch2c 0=384 1=1 2=1 3=1 4=0 5=0 6=36864
+BatchNorm        bn5b_branch2c    1 1 res5b_branch2c res5b_branch2c_bn5b_branch2c 0=384
+Scale            scale5b_branch2c 1 1 res5b_branch2c_bn5b_branch2c res5b_branch2c_scale5b_branch2c 0=384 1=1
+Eltwise          res5b            2 1 res5a_res5a_relu_splitncnn_0 res5b_branch2c_scale5b_branch2c res5b 0=1 -23301=0
+ReLU             res5b_relu       1 1 res5b res5b_res5b_relu
+Convolution      score-dsn1       1 1 conv1_scale_conv1_splitncnn_0 score_dsn1 0=1 1=1 2=1 3=1 4=0 5=1 6=12
+Crop             upscore_dsn1     2 1 score_dsn1 data_splitncnn_4 upscore_dsn1 0=0 1=0
+Convolution      score-dsn2       1 1 res2b_res2b_relu_splitncnn_0 score_dsn2 0=1 1=1 2=1 3=1 4=0 5=1 6=48
+Deconvolution    upsample2        1 1 score_dsn2 score_dsn2_up 0=1 1=4 2=1 3=2 4=0 5=1 6=16
+Crop             upscore_dsn2     2 1 score_dsn2_up data_splitncnn_3 upscore_dsn2 0=0 1=0
+Convolution      score-dsn3       1 1 res3b_res3b_relu_splitncnn_0 score_dsn3 0=1 1=1 2=1 3=1 4=0 5=1 6=96
+Deconvolution    upsample4        1 1 score_dsn3 score_dsn3_up 0=1 1=8 2=1 3=4 4=1 5=1 6=64
+Crop             upscore_dsn3     2 1 score_dsn3_up data_splitncnn_2 upscore_dsn3 0=0 1=0
+Convolution      score-dsn4       1 1 res4b_res4b_relu_splitncnn_0 score_dsn4 0=1 1=1 2=1 3=1 4=0 5=1 6=192
+Deconvolution    upsample8        1 1 score_dsn4 score_dsn4_up 0=1 1=16 2=1 3=8 4=3 5=1 6=256
+Crop             upscore_dsn4     2 1 score_dsn4_up data_splitncnn_1 upscore_dsn4 0=0 1=0
+Convolution      score-dsn5       1 1 res5b_res5b_relu score_dsn5 0=1 1=1 2=1 3=1 4=0 5=1 6=384
+Deconvolution    upsample16       1 1 score_dsn5 score_dsn5_up 0=1 1=32 2=1 3=16 4=7 5=1 6=1024
+Crop             upscore_dsn5     2 1 score_dsn5_up data_splitncnn_0 upscore_dsn5 0=0 1=0
+Concat           concat           5 1 upscore_dsn1 upscore_dsn2 upscore_dsn3 upscore_dsn4 upscore_dsn5 concat_upscore 0=0
+Convolution      new-score-weighting 1 1 concat_upscore upscore_fuse 0=1 1=1 2=1 3=1 4=0 5=1 6=5
+Sigmoid          sigmoid_fuse     1 1 upscore_fuse sigmoid_fuse

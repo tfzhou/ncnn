@@ -36,3 +36,9 @@
 *.exe
 *.out
 *.app
+
+*.caffemodel
+*.bin
+*.param
+
+

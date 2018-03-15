@@ -18,6 +18,8 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
+#include <cmath>
+
 namespace ncnn {
 
 DEFINE_LAYER_CREATOR(BatchNorm_arm)
@@ -32,15 +34,40 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob) const
     int h = bottom_top_blob.h;
     int size = w * h;
 
-    const float* a_data_ptr = a_data;
-    const float* b_data_ptr = b_data;
+    /////
+    Mat a_data_, b_data_;
+    a_data_.create(channels);
+    b_data_.create(channels);
+
+    //TODO: neon version
+    #pragma omp parallel for
+    for(int q=0; q<channels; q++) {
+        float mean = 0, var = 0;
+        const float* ptr = bottom_top_blob.channel(q);
+
+        for(int i=0; i<size; i++) {
+            mean += ptr[i];
+        }
+        mean /= size;
+
+        for(int i=0; i<size; i++) {
+            var += (ptr[i] - mean) * (ptr[i] - mean);
+        }
+        var /= size;
+        float sqrt_var = sqrt(var);
+
+        a_data_[q] = bias_data[q] - mean / (sqrt_var + 1e-6);
+        b_data_[q] = 1.0 / (sqrt_var + 1e-6);
+    }
+    /////
+
     #pragma omp parallel for
     for (int q=0; q<channels; q++)
     {
         float* ptr = bottom_top_blob.channel(q);
 
-        float a = a_data_ptr[q];
-        float b = b_data_ptr[q];
+        float a = a_data_[q];
+        float b = b_data_[q];
 
 #if __ARM_NEON
         int nn = size >> 2;
