@@ -12,19 +12,21 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Installation 
 endif()
 message(STATUS "CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 
-project(ncnn)
-
 cmake_minimum_required(VERSION 2.8.10)
 
-# set(CMAKE_BUILD_TYPE debug)
-# set(CMAKE_BUILD_TYPE relwithdebinfo)
-set(CMAKE_BUILD_TYPE release)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE release CACHE STRING "Choose the type of build" FORCE)
+endif()
+
+project(ncnn)
 
 option(NCNN_OPENMP "openmp support" ON)
 option(NCNN_STDIO "load model from external file" ON)
 option(NCNN_STRING "plain and verbose string" ON)
 option(NCNN_OPENCV "minimal opencv structure emulation" OFF)
 option(NCNN_BENCHMARK "print benchmark information for every layer" OFF)
+option(NCNN_PIXEL "convert and resize from/to image pixel" ON)
+option(NCNN_PIXEL_ROTATE "rotate image pixel orientation" OFF)
 
 if(NCNN_OPENMP)
     find_package(OpenMP)
@@ -34,17 +36,24 @@ if(NCNN_OPENMP)
     endif()
 endif()
 
-add_definitions(-Wall -Wextra -Wno-unused-function)
+if(WIN32)
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE)
+    add_definitions(-DNOMINMAX)
+else()
+    add_definitions(-Wall -Wextra -Wno-unused-function)
 
-add_definitions(-fPIC)
-add_definitions(-Ofast)
+    add_definitions(-fPIC)
+    if(CMAKE_BUILD_TYPE MATCHES "(Release|RELEASE|release)")
+        add_definitions(-Ofast)
 
-add_definitions(-ffast-math)
-# add_definitions(-march=native)
+        add_definitions(-ffast-math)
+    endif()
+    # add_definitions(-march=native)
 
-# add_definitions(-flto)
+    # add_definitions(-flto)
 
-add_definitions(-fvisibility=hidden -fvisibility-inlines-hidden)
+    add_definitions(-fvisibility=hidden -fvisibility-inlines-hidden)
+endif()
 
 if(ANDROID)
     # disable shared library on android

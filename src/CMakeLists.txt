@@ -8,6 +8,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/layer)
 
 set(ncnn_SRCS
+    allocator.cpp
     blob.cpp
     cpu.cpp
     layer.cpp
@@ -39,6 +40,8 @@ macro(ncnn_add_layer class)
         # optimized implementation for armv7 aarch64
         if((ANDROID AND ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "armv7-a"))
             OR (ANDROID AND ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64"))
+            OR (UNIX AND ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "armv7l"))
+            OR (UNIX AND ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64"))
             OR (IOS AND ("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "armv7"))
             OR (IOS AND ("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64"))
             OR (IOS AND ("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "armv7;arm64")))
@@ -142,11 +145,17 @@ ncnn_add_layer(Interp)
 ncnn_add_layer(DeconvolutionDepthWise)
 ncnn_add_layer(ShuffleChannel)
 ncnn_add_layer(InstanceNorm)
+ncnn_add_layer(Clip)
+ncnn_add_layer(Reorg)
+ncnn_add_layer(YoloDetectionOutput)
+ncnn_add_layer(Quantize)
+ncnn_add_layer(Dequantize)
 
 add_library(ncnn STATIC ${ncnn_SRCS})
 
 install(TARGETS ncnn ARCHIVE DESTINATION lib)
 install(FILES
+    allocator.h
     blob.h
     cpu.h
     layer.h

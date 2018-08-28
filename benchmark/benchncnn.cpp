@@ -1,6 +1,14 @@
 #include <float.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+#define NOMINMAX
+#include <algorithm>
+#include <windows.h> // Sleep()
+#else
+#include <unistd.h> // sleep()
+#endif
+
 #include "benchmark.h"
 #include "cpu.h"
 #include "net.h"
@@ -44,6 +52,9 @@ public:
 
 static int g_loop_count = 4;
 
+static ncnn::UnlockedPoolAllocator g_blob_pool_allocator;
+static ncnn::PoolAllocator g_workspace_pool_allocator;
+
 void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const ncnn::Net&))
 {
     ncnn::BenchNet net;
@@ -52,7 +63,19 @@ void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const 
 
     net.load_model();
 
+    g_blob_pool_allocator.clear();
+    g_workspace_pool_allocator.clear();
+
+    // sleep 10 seconds for cooling down SOC  :(
+#ifdef _WIN32
+    Sleep(10 * 1000);
+#else
+    sleep(10);
+#endif
+
     // warm up
+    run(net);
+    run(net);
     run(net);
 
     double time_min = DBL_MAX;
@@ -216,7 +239,7 @@ void squeezenet_ssd_run(const ncnn::Net& net)
 {
     ncnn::Extractor ex = net.create_extractor();
 
-    ncnn::Mat in(227, 227, 3);
+    ncnn::Mat in(300, 300, 3);
     ex.input("data", in);
 
     ncnn::Mat out;
@@ -232,11 +255,43 @@ void mobilenet_ssd_run(const ncnn::Net& net)
 {
     ncnn::Extractor ex = net.create_extractor();
 
-    ncnn::Mat in(227, 227, 3);
+    ncnn::Mat in(300, 300, 3);
     ex.input("data", in);
 
     ncnn::Mat out;
     ex.extract("detection_out", out);
+}
+
+void mobilenet_yolo_init(ncnn::Net& net)
+{
+    net.load_param("mobilenet_yolo.param");
+}
+
+void mobilenet_yolo_run(const ncnn::Net& net)
+{
+    ncnn::Extractor ex = net.create_extractor();
+
+    ncnn::Mat in(416, 416, 3);
+    ex.input("data", in);
+
+    ncnn::Mat out;
+    ex.extract("detection_out", out);
+}
+
+void mnasnet_init(ncnn::Net& net)
+{
+    net.load_param("mnasnet.param");
+}
+
+void mnasnet_run(const ncnn::Net& net)
+{
+    ncnn::Extractor ex = net.create_extractor();
+
+    ncnn::Mat in(224, 224, 3);
+    ex.input("data", in);
+
+    ncnn::Mat out;
+    ex.extract("dense0_fwd", out);
 }
 
 int main(int argc, char** argv)
@@ -260,6 +315,17 @@ int main(int argc, char** argv)
 
     g_loop_count = loop_count;
 
+    g_blob_pool_allocator.set_size_compare_ratio(0.0f);
+    g_workspace_pool_allocator.set_size_compare_ratio(0.5f);
+
+    ncnn::Option opt;
+    opt.lightmode = true;
+    opt.num_threads = num_threads;
+    opt.blob_allocator = &g_blob_pool_allocator;
+    opt.workspace_allocator = &g_workspace_pool_allocator;
+
+    ncnn::set_default_option(opt);
+
     ncnn::set_cpu_powersave(powersave);
 
     ncnn::set_omp_dynamic(0);
@@ -278,6 +344,8 @@ int main(int argc, char** argv)
 
     benchmark("shufflenet", shufflenet_init, shufflenet_run);
 
+    benchmark("mnasnet", mnasnet_init, mnasnet_run);
+
     benchmark("googlenet", googlenet_init, googlenet_run);
 
     benchmark("resnet18", resnet18_init, resnet18_run);
@@ -289,6 +357,8 @@ int main(int argc, char** argv)
     benchmark("squeezenet-ssd", squeezenet_ssd_init, squeezenet_ssd_run);
 
     benchmark("mobilenet-ssd", mobilenet_ssd_init, mobilenet_ssd_run);
+
+    benchmark("mobilenet-yolo", mobilenet_yolo_init, mobilenet_yolo_run);
 
     return 0;
 }
