@@ -9,7 +9,7 @@
 #include "timer.hpp"
 #include "net.h"
 
-#define BATCH
+//#define BATCH
 
 const int MAX_LEN = 640;
 
